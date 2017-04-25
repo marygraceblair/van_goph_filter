@@ -4,7 +4,7 @@ def setup():
     global source, destination
     #update this size based on the size of the image you would like to use 
     size(1200,550)
-    source = loadImage("forrest.jpg")
+    source = loadImage("river.jpg")
     destination = createImage(source.width, source.height, RGB)
     background(0)
     smooth()
@@ -15,72 +15,45 @@ def setup():
 pointillize = [16,5,12,8] 
     
 def draw():
-    global source, destination, pointillize, xoff
-    
-    radius = 5
+    global source, destination, pointillize
     destination.loadPixels()  
-    #a for a in xrange(source.width) if (a % 3 == 0)  
     
     #loop through the pixels             
     for x in (a for a in xrange(source.width) if (a % 3 == 0)):
         for y in (b for b in xrange(source.height) if (b % 3 == 0)):
-            place = x + y*source.width #get the index of the current pixel in the pixel array 
-            intensityCount = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21]
-            averageR = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21]
-            averageG = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21]
-            averageB = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21]
-            curMax = 0
-            maxIndex = -1 
+            #get the index of the current pixel in the pixel array and its RGB values  
+            current = x + y*source.width 
+            currentR = red(source.pixels[current])
+            currentG = green(source.pixels[current])
+            currentB = blue(source.pixels[current])  
             
-            neighbor = 0
-            r = 0
-            g = 0
-            b = 0
-            
+            #convert current pixels into lab for use with coldiff 
+            currentColor = coldiff.rgb2lab((currentR, currentG, currentB))
+
             for xx in range(x-1, x+2):
                 for yy in range(y-1, y+2): 
                     if (xx>=0 and xx<source.width and yy>=0 and yy<source.height and xx!=x and yy!=y):
+                        #current pixel of the neighbor being examined and its RGB 
                         neighbor = xx + yy*source.width 
                         r = red(source.pixels[neighbor])
                         g = green(source.pixels[neighbor])
                         b = blue(source.pixels[neighbor])
-                        curIntensity = (int)((((r+g+b)/3)/80))
-                        averageR[curIntensity] = averageR[curIntensity] + r
-                        averageG[curIntensity] = averageG[curIntensity] + g
-                        averageB[curIntensity] = averageB[curIntensity] + b
-                        #12 groups of 20 intensity levels 
-                        intensityCount[curIntensity] = intensityCount[curIntensity]+1
-                        if intensityCount[curIntensity] > curMax:
-                            curMax = intensityCount[curIntensity]
-                            maxIndex = curIntensity
-                        placeR = red(source.pixels[place])
-                        placeG = green(source.pixels[place])
-                        placeB = blue(source.pixels[place])    
-                        colorA = coldiff.rgb2lab((r,g,b))
-                        colorB = coldiff.rgb2lab((placeR, placeG, placeB))
-                        diff = coldiff.cie94(colorA , colorB)
+                        neighborColor = coldiff.rgb2lab((r,g,b))
+                        diff = coldiff.cie94(currentColor , neighborColor)
                 
-                    #ps = int(random.random(200))
-                    #if (ps < 10):
-                    #ps = int(random(4))
-                    pointSize = pointillize[3]
-                    fill(r,g,b,100)
-                    noStroke
-                    ellipseMode(CENTER)
-                    ellipse(x,y,pointSize,pointSize)
-                        #if (diff < 10):
-                
-                            #if (random(100) < 10):
-                            #lerpColor(color(place), color(neighbor),.33)
-                         #   strokeWeight(12)
-                          #  strokeCap(ROUND)
-                           # stroke(color(place))
-                            #line(x,y,xx, yy)            
-            finalR = averageR[maxIndex] / curMax
-            finalG = averageG[maxIndex] / curMax
-            finalB = averageB[maxIndex] / curMax
-            place = x + y*source.width
-            destination.pixels[place] = color(finalR, finalG, finalB)
+                        #fill(r,g,b,100)
+                        #noStroke
+                        #ellipseMode(CENTER)
+                        # ellipse(x,y,pointSize,pointSize)
+                        #
+                        if (diff < 3):
+                            strokeWeight(12)
+                            strokeCap(ROUND)
+                            stroke(currentR, currentG, currentB)
+                            if (random(100) < 10):
+                                stroke(lerpColor(color(current), color(neighbor),.33))
+                            line(x,y,xx, yy)   
+            destination.pixels[current] = color(current)
             
             #    ps = int(random(200))
                 #if (ps < 10):
