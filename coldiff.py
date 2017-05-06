@@ -1,7 +1,10 @@
+# *****************************************************************************
+#source: https://gist.github.com/fikr4n/368f2f2070e0f9a15fb4
+# *****************************************************************************
+
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-#source: https://gist.github.com/marygraceblair/ef858e0f8a314591100c8890cd5c8860
 from math import sqrt
 
 
